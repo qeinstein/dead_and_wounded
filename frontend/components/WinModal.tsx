@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Trophy, Sparkles, RotateCcw, Award } from 'lucide-react';
+import { Trophy, Sparkles, RotateCcw } from 'lucide-react';
 import { Game } from '@/lib/api';
 
 interface WinModalProps {
@@ -82,7 +82,7 @@ export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
           <div className="space-y-0.5">
             <div className="text-slate-400">Game Mode</div>
             <div className="text-xs font-semibold text-indigo-300 pt-1">
-              {is2Player ? 'Pass & Play' : 'VS Computer'}
+              {is2Player ? 'Pass &amp; Play' : 'VS Computer'}
             </div>
           </div>
         </div>

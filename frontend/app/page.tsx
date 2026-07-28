@@ -21,8 +21,8 @@ export default function Home() {
     try {
       const newGame = await createGame({ mode, customSecretCode });
       setGame(newGame);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to start game session.');
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to start game session.');
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +44,8 @@ export default function Home() {
           revealedSecretCode: result.gameOver ? prev.revealedSecretCode || guess : undefined,
         };
       });
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to evaluate guess.');
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to evaluate guess.');
     } finally {
       setIsLoading(false);
     }
@@ -56,8 +56,9 @@ export default function Home() {
     setErrorMessage(null);
   };
 
-  const isGameOver =
-    game && (game.status === 'WON' || game.status === 'PLAYER1_WON' || game.status === 'PLAYER2_WON');
+  const isGameOver: boolean = Boolean(
+    game && (game.status === 'WON' || game.status === 'PLAYER1_WON' || game.status === 'PLAYER2_WON')
+  );
 
   return (
     <div className="min-h-screen flex flex-col justify-between">
@@ -88,12 +89,12 @@ export default function Home() {
       </div>
 
       {/* Win Modal Overlay */}
-      {game && isGameOver && <WinModal game={game} onPlayAgain={handleReset} />}
+      {game && isGameOver ? <WinModal game={game} onPlayAgain={handleReset} /> : null}
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-800/60">
-        Dead & Wounded &copy; {new Date().getFullYear()} &bull; Master Logic Deduction Game
+        Dead &amp; Wounded &copy; {new Date().getFullYear()} &bull; Master Logic Deduction Game
       </footer>
     </div>
   );
-};
+}

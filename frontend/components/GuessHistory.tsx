@@ -15,7 +15,7 @@ export const GuessHistory: React.FC<GuessHistoryProps> = ({ history, mode }) => 
       <div className="w-full max-w-md mx-auto p-6 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-800 text-center space-y-2">
         <History className="w-8 h-8 mx-auto text-slate-600 animate-pulse-slow" />
         <h3 className="text-sm font-semibold text-slate-300">No Guesses Yet</h3>
-        <p className="text-xs text-slate-500">Enter a 4-digit guess above to receive Dead & Wounded feedback.</p>
+        <p className="text-xs text-slate-500">Enter a 4-digit guess above to receive Dead &amp; Wounded feedback.</p>
       </div>
     );
   }

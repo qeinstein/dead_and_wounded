@@ -61,7 +61,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, isLoading }) 
     <div className="w-full max-w-md mx-auto p-6 bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-800 shadow-2xl space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-extrabold text-white">Setup Game</h2>
-        <p className="text-sm text-slate-400">Select game mode & crack the 4-digit code</p>
+        <p className="text-sm text-slate-400">Select game mode &amp; crack the 4-digit code</p>
       </div>
 
       {/* Mode Selector */}
@@ -95,7 +95,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, isLoading }) 
           }`}
         >
           <Users className="w-4 h-4" />
-          2 Players Pass & Play
+          2 Players Pass &amp; Play
         </button>
       </div>
 

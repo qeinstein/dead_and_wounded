@@ -19,9 +19,9 @@ export const Navbar: React.FC<NavbarProps> = ({ mode, onReset }) => {
           </div>
           <div>
             <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
-              Dead & Wounded
+              Dead &amp; Wounded
             </h1>
-            <p className="text-xs text-slate-400 font-medium">Bulls & Cows Code Breaker</p>
+            <p className="text-xs text-slate-400 font-medium">Bulls &amp; Cows Code Breaker</p>
           </div>
         </div>
 
@@ -34,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({ mode, onReset }) => {
                 </>
               ) : (
                 <>
-                  <Users className="w-3.5 h-3.5" /> 2 Players (Pass & Play)
+                  <Users className="w-3.5 h-3.5" /> 2 Players (Pass &amp; Play)
                 </>
               )}
             </span>
