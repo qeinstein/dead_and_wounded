@@ -7,45 +7,49 @@ import { TurnIndicator } from '@/components/TurnIndicator';
 import { KeypadInput } from '@/components/KeypadInput';
 import { GuessHistory } from '@/components/GuessHistory';
 import { WinModal } from '@/components/WinModal';
-import { createGame, submitGuess, Game, GameMode } from '@/lib/api';
-import { AlertCircle } from 'lucide-react';
+import { createGame, submitGuess, getGame, Game, GameMode } from '@/lib/api';
 
 export default function Home() {
   const [game, setGame] = useState<Game | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCreateGame = async (mode: GameMode, customSecretCode?: string) => {
+  const handleStart = async (mode: GameMode, customSecretCode?: string) => {
     setIsLoading(true);
-    setErrorMessage(null);
+    setError(null);
     try {
-      const newGame = await createGame({ mode, customSecretCode });
-      setGame(newGame);
+      const g = await createGame({ mode, customSecretCode });
+      setGame(g);
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to start game session.');
+      setError(err instanceof Error ? err.message : 'Failed to start game.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGuessSubmit = async (guess: string) => {
+  const handleGuess = async (guess: string) => {
     if (!game) return;
     setIsLoading(true);
-    setErrorMessage(null);
+    setError(null);
     try {
       const result = await submitGuess(game.id, guess);
-      setGame((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          status: result.status,
-          currentTurn: result.nextTurn || prev.currentTurn,
-          history: result.history,
-          revealedSecretCode: result.gameOver ? prev.revealedSecretCode || guess : undefined,
-        };
-      });
+      // After guess, re-fetch full game state for accurate revealedSecretCode
+      if (result.gameOver) {
+        const fullGame = await getGame(game.id);
+        setGame(fullGame);
+      } else {
+        setGame(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            status: result.status,
+            currentTurn: result.nextTurn || prev.currentTurn,
+            history: result.history,
+          };
+        });
+      }
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to evaluate guess.');
+      setError(err instanceof Error ? err.message : 'Invalid guess.');
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +57,7 @@ export default function Home() {
 
   const handleReset = () => {
     setGame(null);
-    setErrorMessage(null);
+    setError(null);
   };
 
   const isGameOver: boolean = Boolean(
@@ -61,39 +65,42 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
-      <div>
-        <Navbar mode={game?.mode} onReset={handleReset} />
+    <div className="min-h-[100dvh] flex flex-col">
+      <Navbar mode={game?.mode} onReset={handleReset} />
 
-        <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-          {errorMessage && (
-            <div className="max-w-md mx-auto p-3 bg-red-950/80 border border-red-800 rounded-xl text-xs text-red-200 flex items-center gap-2 shadow-lg animate-shake">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
+      <main className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        {error && (
+          <div className="mb-4 px-4 py-2.5 rounded-xl bg-dead/10 border border-dead/20 text-xs text-dead text-center animate-fade-in">
+            {error}
+          </div>
+        )}
 
-          {!game ? (
-            <GameSetup onStartGame={handleCreateGame} isLoading={isLoading} />
-          ) : (
-            <div className="space-y-6 animate-fade-in">
-              <TurnIndicator mode={game.mode} currentTurn={game.currentTurn} />
+        {!game ? (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <GameSetup onStartGame={handleStart} isLoading={isLoading} />
+          </div>
+        ) : (
+          <div className="space-y-6 animate-fade-in">
+            <TurnIndicator mode={game.mode} currentTurn={game.currentTurn} />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                <KeypadInput onSubmit={handleGuessSubmit} isLoading={isLoading || isGameOver} />
+            {/* Responsive layout: stacked on mobile, side-by-side on desktop */}
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+              <div className="w-full lg:w-auto lg:flex-shrink-0">
+                <KeypadInput onSubmit={handleGuess} isLoading={isLoading || isGameOver} />
+              </div>
+              <div className="w-full lg:flex-1 lg:min-w-0">
                 <GuessHistory history={game.history} mode={game.mode} />
               </div>
             </div>
-          )}
-        </main>
-      </div>
+          </div>
+        )}
+      </main>
 
-      {/* Win Modal Overlay */}
+      {/* Win Modal */}
       {game && isGameOver ? <WinModal game={game} onPlayAgain={handleReset} /> : null}
 
-      {/* Footer */}
-      <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-800/60">
-        Dead &amp; Wounded &copy; {new Date().getFullYear()} &bull; Master Logic Deduction Game
+      <footer className="py-3 text-center text-[10px] text-neutral-700 border-t border-surface-border">
+        Dead &amp; Wounded &copy; {new Date().getFullYear()}
       </footer>
     </div>
   );

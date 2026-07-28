@@ -1,12 +1,16 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
-
 export const metadata: Metadata = {
-  title: 'Dead & Wounded | Bulls & Cows Deduction Game',
-  description: 'Classic 4-digit code-breaking deduction game featuring Single Player vs Computer and 2-Player Pass & Play modes.',
+  title: 'Dead & Wounded — Code Breaker',
+  description: 'A classic 4-digit code-breaking deduction game. Single player or pass-and-play with a friend.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -16,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

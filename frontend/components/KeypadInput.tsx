@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Delete, RotateCcw, Send, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface KeypadInputProps {
   onSubmit: (guess: string) => void;
@@ -10,131 +9,111 @@ interface KeypadInputProps {
 
 export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading }) => {
   const [digits, setDigits] = useState<string[]>([]);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
 
-  const handleKeyPress = (digit: string) => {
+  const addDigit = useCallback((d: string) => {
     if (digits.length >= 4) return;
-    if (digits.includes(digit)) {
-      setError(`Digit '${digit}' is already selected. Duplicates not allowed.`);
+    if (digits.includes(d)) {
+      setError(`'${d}' already used`);
       return;
     }
     setError('');
-    setDigits([...digits, digit]);
-  };
+    setDigits(prev => [...prev, d]);
+  }, [digits]);
 
-  const handleBackspace = () => {
+  const removeLast = useCallback(() => {
     setError('');
-    setDigits(digits.slice(0, -1));
-  };
+    setDigits(prev => prev.slice(0, -1));
+  }, []);
 
-  const handleClear = () => {
+  const clearAll = useCallback(() => {
     setError('');
     setDigits([]);
-  };
+  }, []);
 
-  const handleSubmit = () => {
+  const submit = useCallback(() => {
     if (digits.length !== 4) {
-      setError('Guess must be exactly 4 unique digits.');
+      setError('Enter 4 digits');
       return;
     }
-    const guess = digits.join('');
-    onSubmit(guess);
+    onSubmit(digits.join(''));
     setDigits([]);
     setError('');
-  };
+  }, [digits, onSubmit]);
 
-  // Keyboard navigation support
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if (isLoading) return;
-
-      if (e.key >= '0' && e.key <= '9') {
-        handleKeyPress(e.key);
-      } else if (e.key === 'Backspace') {
-        handleBackspace();
-      } else if (e.key === 'Escape') {
-        handleClear();
-      } else if (e.key === 'Enter') {
-        if (digits.length === 4) {
-          handleSubmit();
-        }
-      }
+      if (e.key >= '0' && e.key <= '9') addDigit(e.key);
+      else if (e.key === 'Backspace') removeLast();
+      else if (e.key === 'Escape') clearAll();
+      else if (e.key === 'Enter' && digits.length === 4) submit();
     };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [digits, isLoading]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [digits, isLoading, addDigit, removeLast, clearAll, submit]);
 
   return (
-    <div className="w-full max-w-md mx-auto p-5 bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-800 shadow-2xl space-y-4">
-      {/* 4 Digit Display */}
-      <div className="flex justify-center gap-3">
-        {[0, 1, 2, 3].map((idx) => {
-          const char = digits[idx];
-          return (
-            <div
-              key={idx}
-              className={`w-14 h-16 rounded-xl border-2 flex items-center justify-center font-mono text-2xl font-bold transition-all duration-200 shadow-inner ${
-                char
-                  ? 'bg-indigo-950/60 border-indigo-500 text-indigo-200 scale-[1.03] shadow-indigo-500/20'
-                  : 'bg-slate-950 border-slate-800 text-slate-600'
-              }`}
-            >
-              {char || '_'}
-            </div>
-          );
-        })}
+    <div className="w-full space-y-4">
+      {/* Digit Display */}
+      <div className="flex justify-center gap-2 sm:gap-3">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className={`w-12 h-14 sm:w-14 sm:h-16 rounded-xl border-2 flex items-center justify-center font-mono text-xl sm:text-2xl font-bold transition-all ${
+              digits[i]
+                ? 'bg-surface-2 border-accent/40 text-white'
+                : 'bg-surface-1 border-surface-border text-neutral-700'
+            }`}
+          >
+            {digits[i] || '·'}
+          </div>
+        ))}
       </div>
 
-      {/* Instant Validation Warning */}
       {error && (
-        <div className="flex items-center justify-center gap-1.5 text-xs text-red-400 font-medium bg-red-950/40 border border-red-900/50 py-1.5 px-3 rounded-lg animate-pulse">
-          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-          <span>{error}</span>
-        </div>
+        <p className="text-[11px] text-dead text-center animate-fade-in">{error}</p>
       )}
 
-      {/* Numeric Keypad Grid */}
-      <div className="grid grid-cols-3 gap-2 pt-1">
-        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => {
-          const isSelected = digits.includes(num);
+      {/* Keypad */}
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[240px] sm:max-w-[280px] mx-auto">
+        {['1','2','3','4','5','6','7','8','9'].map((n) => {
+          const used = digits.includes(n);
           return (
             <button
-              key={num}
+              key={n}
               type="button"
-              disabled={isLoading || isSelected}
-              onClick={() => handleKeyPress(num)}
-              className={`h-12 rounded-xl font-mono text-lg font-bold transition-all duration-150 active:scale-95 shadow-md flex items-center justify-center ${
-                isSelected
-                  ? 'bg-slate-950 text-slate-600 border border-slate-800 cursor-not-allowed opacity-40'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 hover:border-indigo-500'
+              disabled={isLoading || used}
+              onClick={() => addDigit(n)}
+              className={`h-11 sm:h-12 rounded-xl font-mono text-base font-semibold transition-all active:scale-95 ${
+                used
+                  ? 'bg-surface-1 text-neutral-700 cursor-not-allowed'
+                  : 'bg-surface-2 text-neutral-200 hover:bg-surface-3 border border-surface-border hover:border-neutral-600'
               }`}
             >
-              {num}
+              {n}
             </button>
           );
         })}
 
-        {/* Bottom Row */}
+        {/* Bottom row */}
         <button
           type="button"
           disabled={isLoading || digits.length === 0}
-          onClick={handleClear}
-          className="h-12 rounded-xl bg-slate-800/60 hover:bg-slate-700/80 text-slate-400 hover:text-slate-200 border border-slate-700/80 font-medium text-xs flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-30"
-          title="Clear (Esc)"
+          onClick={clearAll}
+          className="h-11 sm:h-12 rounded-xl text-xs font-medium text-neutral-500 hover:text-neutral-300 bg-surface-1 border border-surface-border transition-colors disabled:opacity-30 active:scale-95"
         >
-          <RotateCcw className="w-4 h-4" />
           Clear
         </button>
 
         <button
           type="button"
           disabled={isLoading || digits.includes('0')}
-          onClick={() => handleKeyPress('0')}
-          className={`h-12 rounded-xl font-mono text-lg font-bold transition-all duration-150 active:scale-95 shadow-md flex items-center justify-center ${
+          onClick={() => addDigit('0')}
+          className={`h-11 sm:h-12 rounded-xl font-mono text-base font-semibold transition-all active:scale-95 ${
             digits.includes('0')
-              ? 'bg-slate-950 text-slate-600 border border-slate-800 cursor-not-allowed opacity-40'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 hover:border-indigo-500'
+              ? 'bg-surface-1 text-neutral-700 cursor-not-allowed'
+              : 'bg-surface-2 text-neutral-200 hover:bg-surface-3 border border-surface-border hover:border-neutral-600'
           }`}
         >
           0
@@ -143,24 +122,24 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
         <button
           type="button"
           disabled={isLoading || digits.length === 0}
-          onClick={handleBackspace}
-          className="h-12 rounded-xl bg-slate-800/60 hover:bg-slate-700/80 text-slate-400 hover:text-slate-200 border border-slate-700/80 font-medium text-xs flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-30"
-          title="Backspace"
+          onClick={removeLast}
+          className="h-11 sm:h-12 rounded-xl text-xs font-medium text-neutral-500 hover:text-neutral-300 bg-surface-1 border border-surface-border transition-colors disabled:opacity-30 active:scale-95"
         >
-          <Delete className="w-4 h-4" />
+          ←
         </button>
       </div>
 
-      {/* Submit Button */}
-      <button
-        type="button"
-        disabled={isLoading || digits.length !== 4}
-        onClick={handleSubmit}
-        className="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        <Send className="w-4 h-4" />
-        {isLoading ? 'Evaluating...' : 'Submit Guess'}
-      </button>
+      {/* Submit */}
+      <div className="max-w-[240px] sm:max-w-[280px] mx-auto">
+        <button
+          type="button"
+          disabled={isLoading || digits.length !== 4}
+          onClick={submit}
+          className="w-full py-3 rounded-xl font-semibold text-sm bg-accent hover:bg-accent-dim text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
+        >
+          {isLoading ? 'Checking...' : 'Submit'}
+        </button>
+      </div>
     </div>
   );
 };

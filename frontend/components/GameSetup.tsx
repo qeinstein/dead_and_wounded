@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Users, Lock, Eye, EyeOff, Sparkles, AlertCircle } from 'lucide-react';
 import { GameMode } from '@/lib/api';
 
 interface GameSetupProps {
@@ -11,44 +10,31 @@ interface GameSetupProps {
 
 export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, isLoading }) => {
   const [mode, setMode] = useState<GameMode>('VS_COMPUTER');
-  const [customCodeType, setCustomCodeType] = useState<'RANDOM' | 'CUSTOM'>('RANDOM');
+  const [codeType, setCodeType] = useState<'random' | 'custom'>('random');
   const [customCode, setCustomCode] = useState('');
-  const [showSecret, setShowSecret] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [showCode, setShowCode] = useState(false);
+  const [error, setError] = useState('');
+  const [showInstructions, setShowInstructions] = useState(false);
 
-  const validateCode = (val: string): boolean => {
-    if (!val) {
-      setErrorMsg('');
-      return false;
-    }
-    if (!/^\d+$/.test(val)) {
-      setErrorMsg('Code must contain numbers only (0-9)');
-      return false;
-    }
-    const chars = val.split('');
-    const hasDupes = new Set(chars).size !== chars.length;
-    if (hasDupes) {
-      setErrorMsg('All 4 digits must be unique (e.g. 1234)');
-      return false;
-    }
-    if (val.length !== 4) {
-      setErrorMsg('Code must be exactly 4 digits long');
-      return false;
-    }
-    setErrorMsg('');
+  const validate = (val: string): boolean => {
+    if (!val) { setError(''); return false; }
+    if (!/^\d+$/.test(val)) { setError('Numbers only (0–9)'); return false; }
+    if (new Set(val).size !== val.length) { setError('No duplicate digits'); return false; }
+    if (val.length !== 4) { setError('Must be 4 digits'); return false; }
+    setError('');
     return true;
   };
 
-  const handleCustomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, '').slice(0, 4);
     setCustomCode(val);
-    validateCode(val);
+    validate(val);
   };
 
   const handleStart = () => {
-    if (mode === 'TWO_PLAYER_SAME_DEVICE' && customCodeType === 'CUSTOM') {
-      if (!validateCode(customCode)) {
-        if (!errorMsg) setErrorMsg('Please enter a valid 4-digit unique code');
+    if (mode === 'TWO_PLAYER_SAME_DEVICE' && codeType === 'custom') {
+      if (!validate(customCode)) {
+        if (!error) setError('Enter a valid 4-digit code');
         return;
       }
       onStartGame(mode, customCode);
@@ -57,134 +43,130 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, isLoading }) 
     }
   };
 
+  const is2P = mode === 'TWO_PLAYER_SAME_DEVICE';
+
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-800 shadow-2xl space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-extrabold text-white">Setup Game</h2>
-        <p className="text-sm text-slate-400">Select game mode &amp; crack the 4-digit code</p>
+    <div className="w-full max-w-sm mx-auto space-y-6 animate-fade-in">
+      {/* Title */}
+      <div className="text-center space-y-1">
+        <h2 className="text-lg font-bold text-white">New Game</h2>
+        <p className="text-xs text-neutral-500">Crack the secret 4-digit code</p>
       </div>
 
-      {/* Mode Selector */}
-      <div className="grid grid-cols-2 gap-3 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800">
-        <button
-          type="button"
-          onClick={() => {
-            setMode('VS_COMPUTER');
-            setErrorMsg('');
-          }}
-          className={`flex items-center justify-center gap-2 py-3 px-3 rounded-lg font-semibold text-xs transition-all ${
-            mode === 'VS_COMPUTER'
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-          }`}
-        >
-          <User className="w-4 h-4" />
-          Single Player
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setMode('TWO_PLAYER_SAME_DEVICE');
-            setErrorMsg('');
-          }}
-          className={`flex items-center justify-center gap-2 py-3 px-3 rounded-lg font-semibold text-xs transition-all ${
-            mode === 'TWO_PLAYER_SAME_DEVICE'
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          2 Players Pass &amp; Play
-        </button>
+      {/* Mode Toggle */}
+      <div className="flex rounded-xl bg-surface-1 border border-surface-border p-1 gap-1">
+        {(['VS_COMPUTER', 'TWO_PLAYER_SAME_DEVICE'] as GameMode[]).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => { setMode(m); setError(''); }}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+              mode === m
+                ? 'bg-accent text-white shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-300'
+            }`}
+          >
+            {m === 'VS_COMPUTER' ? 'Solo' : '2 Players'}
+          </button>
+        ))}
       </div>
 
-      {/* Mode Details */}
-      {mode === 'VS_COMPUTER' ? (
-        <div className="p-4 bg-slate-800/40 rounded-xl border border-slate-800/80 space-y-2 text-xs text-slate-300">
-          <div className="flex items-center gap-2 text-indigo-400 font-semibold text-sm">
-            <Sparkles className="w-4 h-4" />
-            System Secret Code
+      {/* Mode Description */}
+      <div className="rounded-xl bg-surface-1 border border-surface-border p-4">
+        {!is2P ? (
+          <div className="text-center space-y-1">
+            <p className="text-xs font-semibold text-neutral-300">Computer generates the code</p>
+            <p className="text-[11px] text-neutral-500">Guess it in as few tries as possible</p>
           </div>
-          <p>The computer will generate a secret 4-digit unique code. Crack it in as few guesses as possible!</p>
-        </div>
-      ) : (
-        <div className="space-y-4 p-4 bg-slate-800/40 rounded-xl border border-slate-800/80">
-          <div className="text-xs font-semibold text-slate-300">Player 1 Secret Code Configuration:</div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setCustomCodeType('RANDOM');
-                setErrorMsg('');
-              }}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium border ${
-                customCodeType === 'RANDOM'
-                  ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300'
-                  : 'bg-slate-900 border-slate-700 text-slate-400'
-              }`}
-            >
-              Random Code
-            </button>
-            <button
-              type="button"
-              onClick={() => setCustomCodeType('CUSTOM')}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium border ${
-                customCodeType === 'CUSTOM'
-                  ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300'
-                  : 'bg-slate-900 border-slate-700 text-slate-400'
-              }`}
-            >
-              Custom Code
-            </button>
-          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-xs font-semibold text-neutral-300 text-center">Secret code for this round</p>
 
-          {customCodeType === 'CUSTOM' && (
-            <div className="space-y-2 pt-2">
-              <label className="text-xs text-slate-400 flex items-center justify-between">
-                <span>Player 1 Secret Code (4 Unique Digits):</span>
+            {/* Code Type */}
+            <div className="flex gap-2">
+              {(['random', 'custom'] as const).map((t) => (
                 <button
+                  key={t}
                   type="button"
-                  onClick={() => setShowSecret(!showSecret)}
-                  className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[11px]"
+                  onClick={() => { setCodeType(t); setError(''); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                    codeType === t
+                      ? 'border-accent/50 bg-accent/10 text-accent'
+                      : 'border-surface-border text-neutral-500 hover:text-neutral-300'
+                  }`}
                 >
-                  {showSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  {showSecret ? 'Hide' : 'Reveal'}
+                  {t === 'random' ? 'Random' : 'Custom'}
                 </button>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <input
-                  type={showSecret ? 'text' : 'password'}
-                  maxLength={4}
-                  value={customCode}
-                  onChange={handleCustomCodeChange}
-                  placeholder="e.g. 1234"
-                  className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-center tracking-[0.4em] font-mono text-lg text-white focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              {errorMsg && (
-                <div className="flex items-center gap-1.5 text-xs text-red-400 pt-1">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
+              ))}
             </div>
-          )}
-        </div>
-      )}
 
+            {codeType === 'custom' && (
+              <div className="space-y-2">
+                <div className="relative">
+                  <input
+                    type={showCode ? 'text' : 'password'}
+                    maxLength={4}
+                    value={customCode}
+                    onChange={onCodeChange}
+                    placeholder="e.g. 1234"
+                    className="w-full px-4 py-3 bg-surface-2 border border-surface-border rounded-xl text-center tracking-[0.5em] font-mono text-base text-white placeholder:text-neutral-600 focus:outline-none focus:border-accent/50 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCode(!showCode)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-neutral-500 hover:text-neutral-300"
+                  >
+                    {showCode ? 'hide' : 'show'}
+                  </button>
+                </div>
+                {error && (
+                  <p className="text-[11px] text-dead text-center">{error}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Start Button */}
       <button
         type="button"
         onClick={handleStart}
-        disabled={isLoading || (mode === 'TWO_PLAYER_SAME_DEVICE' && customCodeType === 'CUSTOM' && customCode.length !== 4)}
-        className="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-lg shadow-indigo-500/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={isLoading || (is2P && codeType === 'custom' && customCode.length !== 4)}
+        className="w-full py-3 rounded-xl font-semibold text-sm bg-accent hover:bg-accent-dim text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
       >
-        {isLoading ? 'Starting Game...' : 'Start Game'}
+        {isLoading ? 'Starting...' : 'Start Game'}
       </button>
+
+      {/* Collapsible Rules Guide */}
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={() => setShowInstructions(!showInstructions)}
+          className="w-full flex items-center justify-between text-xs text-neutral-500 hover:text-neutral-300 py-1 transition-colors border-t border-surface-border/50 pt-3"
+        >
+          <span>How to Play &amp; Rules</span>
+          <span>{showInstructions ? '▲' : '▼'}</span>
+        </button>
+
+        {showInstructions && (
+          <div className="mt-3 p-3.5 bg-surface-1 rounded-xl border border-surface-border space-y-2.5 text-xs text-neutral-400 animate-fade-in text-left">
+            <p className="text-neutral-300 font-medium">
+              Guess the secret 4-digit code (numbers 0–9, no duplicates).
+            </p>
+            <div className="space-y-1.5 pt-1 text-[11px]">
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-dead">Dead (D)</span>
+                <span>Correct digit in the correct position.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-wounded">Wounded (W)</span>
+                <span>Correct digit, but in wrong position.</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
