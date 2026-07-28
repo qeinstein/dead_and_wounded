@@ -30,16 +30,33 @@ public class GameService {
             throw new IllegalArgumentException("Game mode must be specified");
         }
 
-        String secretCode;
-        if (request.getMode() == GameMode.TWO_PLAYER_SAME_DEVICE && request.getCustomSecretCode() != null && !request.getCustomSecretCode().trim().isEmpty()) {
-            secretCode = request.getCustomSecretCode().trim();
-            logicService.validateCode(secretCode);
+        String p1Code;
+        String p2Code;
+
+        if (request.getMode() == GameMode.TWO_PLAYER_SAME_DEVICE) {
+            // Player 1's code (guessed by Player 2)
+            if (request.getPlayer1SecretCode() != null && !request.getPlayer1SecretCode().trim().isEmpty()) {
+                p1Code = request.getPlayer1SecretCode().trim();
+                logicService.validateCode(p1Code);
+            } else {
+                p1Code = logicService.generateRandomCode();
+            }
+
+            // Player 2's code (guessed by Player 1)
+            if (request.getPlayer2SecretCode() != null && !request.getPlayer2SecretCode().trim().isEmpty()) {
+                p2Code = request.getPlayer2SecretCode().trim();
+                logicService.validateCode(p2Code);
+            } else {
+                p2Code = logicService.generateRandomCode();
+            }
         } else {
-            secretCode = logicService.generateRandomCode();
+            // VS_COMPUTER: Computer generates secret code (p1Code)
+            p1Code = logicService.generateRandomCode();
+            p2Code = p1Code; // for single player mode, target is p1Code
         }
 
         String gameId = UUID.randomUUID().toString();
-        Game game = new Game(gameId, request.getMode(), secretCode);
+        Game game = new Game(gameId, request.getMode(), p1Code, p2Code);
         games.put(gameId, game);
         return game;
     }
@@ -62,10 +79,23 @@ public class GameService {
         logicService.validateCode(guessStr);
 
         Player currentTurn = game.getCurrentTurn();
-        GameLogicService.Feedback feedback = logicService.evaluate(game.getSecretCode(), guessStr);
+        // Determine target code:
+        // Player 1 guesses Player 2's code (player2SecretCode)
+        // Player 2 guesses Player 1's code (player1SecretCode)
+        String targetCode = (currentTurn == Player.PLAYER_1) 
+                ? (game.getMode() == GameMode.VS_COMPUTER ? game.getPlayer1SecretCode() : game.getPlayer2SecretCode()) 
+                : game.getPlayer1SecretCode();
+
+        GameLogicService.Feedback feedback = logicService.evaluate(targetCode, guessStr);
 
         GuessRecord record = new GuessRecord(guessStr, feedback.getDead(), feedback.getWounded(), currentTurn);
         game.getHistory().add(record);
+
+        if (currentTurn == Player.PLAYER_1) {
+            game.getPlayer1History().add(record);
+        } else {
+            game.getPlayer2History().add(record);
+        }
 
         boolean gameOver = false;
         Player winner = null;
@@ -96,7 +126,9 @@ public class GameService {
                 game.getStatus(),
                 winner,
                 nextTurn,
-                game.getHistory()
+                game.getHistory(),
+                game.getPlayer1History(),
+                game.getPlayer2History()
         );
     }
 }

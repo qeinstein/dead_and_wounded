@@ -11,6 +11,8 @@ public class GuessResult {
     private Player winner;
     private Player nextTurn;
     private List<GuessRecord> history;
+    private List<GuessRecord> player1History;
+    private List<GuessRecord> player2History;
 
     public GuessResult() {
     }
@@ -24,6 +26,19 @@ public class GuessResult {
         this.winner = winner;
         this.nextTurn = nextTurn;
         this.history = history;
+    }
+
+    public GuessResult(String guess, int dead, int wounded, boolean gameOver, GameStatus status, Player winner, Player nextTurn, List<GuessRecord> history, List<GuessRecord> player1History, List<GuessRecord> player2History) {
+        this.guess = guess;
+        this.dead = dead;
+        this.wounded = wounded;
+        this.gameOver = gameOver;
+        this.status = status;
+        this.winner = winner;
+        this.nextTurn = nextTurn;
+        this.history = history;
+        this.player1History = player1History;
+        this.player2History = player2History;
     }
 
     public String getGuess() {
@@ -88,5 +103,21 @@ public class GuessResult {
 
     public void setHistory(List<GuessRecord> history) {
         this.history = history;
+    }
+
+    public List<GuessRecord> getPlayer1History() {
+        return player1History;
+    }
+
+    public void setPlayer1History(List<GuessRecord> player1History) {
+        this.player1History = player1History;
+    }
+
+    public List<GuessRecord> getPlayer2History() {
+        return player2History;
+    }
+
+    public void setPlayer2History(List<GuessRecord> player2History) {
+        this.player2History = player2History;
     }
 }

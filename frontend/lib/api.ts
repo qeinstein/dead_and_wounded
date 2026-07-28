@@ -16,7 +16,11 @@ export interface Game {
   status: GameStatus;
   currentTurn: Player;
   history: GuessRecord[];
+  player1History?: GuessRecord[];
+  player2History?: GuessRecord[];
   revealedSecretCode?: string;
+  revealedPlayer1SecretCode?: string;
+  revealedPlayer2SecretCode?: string;
   createdAt: string;
 }
 
@@ -29,10 +33,14 @@ export interface GuessResult {
   winner?: Player;
   nextTurn?: Player;
   history: GuessRecord[];
+  player1History?: GuessRecord[];
+  player2History?: GuessRecord[];
 }
 
 export interface CreateGamePayload {
   mode: GameMode;
+  player1SecretCode?: string;
+  player2SecretCode?: string;
   customSecretCode?: string;
 }
 

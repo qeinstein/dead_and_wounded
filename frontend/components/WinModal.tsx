@@ -25,8 +25,11 @@ export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
 
   let winner = 'You cracked it!';
   if (is2P) {
-    winner = game.status === 'PLAYER1_WON' ? 'Player 1 wins!' : 'Player 2 wins!';
+    winner = game.status === 'PLAYER1_WON' ? 'Player 1 Wins!' : 'Player 2 Wins!';
   }
+
+  const p1Code = game.revealedPlayer1SecretCode || (is2P ? '????' : null);
+  const p2Code = game.revealedPlayer2SecretCode || game.revealedSecretCode || '????';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
@@ -35,30 +38,47 @@ export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
         <div className="text-4xl">🏆</div>
 
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-win">Code Broken</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-win">Match Completed</p>
           <h2 className="text-xl font-bold text-white">{winner}</h2>
         </div>
 
-        {/* Secret Code Reveal */}
-        {game.revealedSecretCode && (
-          <div className="py-3 px-4 bg-surface-2 rounded-xl border border-surface-border">
-            <p className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1">Secret Code</p>
-            <p className="text-2xl font-mono font-bold tracking-[0.4em] text-accent">
-              {game.revealedSecretCode}
-            </p>
+        {/* Revealed Secret Codes */}
+        {is2P ? (
+          <div className="grid grid-cols-2 gap-2 p-2.5 bg-surface-2 rounded-xl border border-surface-border text-center">
+            <div className="space-y-0.5">
+              <p className="text-[10px] text-neutral-500 font-medium">Player 1 Code</p>
+              <p className="text-base font-mono font-bold text-accent tracking-widest">
+                {p1Code}
+              </p>
+            </div>
+            <div className="space-y-0.5 border-l border-surface-border pl-2">
+              <p className="text-[10px] text-neutral-500 font-medium">Player 2 Code</p>
+              <p className="text-base font-mono font-bold text-purple-400 tracking-widest">
+                {p2Code}
+              </p>
+            </div>
           </div>
+        ) : (
+          game.revealedSecretCode && (
+            <div className="py-3 px-4 bg-surface-2 rounded-xl border border-surface-border">
+              <p className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1">Secret Code</p>
+              <p className="text-2xl font-mono font-bold tracking-[0.4em] text-accent">
+                {game.revealedSecretCode}
+              </p>
+            </div>
+          )
         )}
 
         {/* Stats */}
         <div className="flex justify-center gap-6 text-xs">
           <div>
-            <p className="text-neutral-500">Guesses</p>
+            <p className="text-neutral-500">Total Rounds</p>
             <p className="text-lg font-bold text-white">{total}</p>
           </div>
           <div>
             <p className="text-neutral-500">Mode</p>
             <p className="text-xs font-semibold text-neutral-300 mt-1">
-              {is2P ? 'Pass &amp; Play' : 'Solo'}
+              {is2P ? '2-Player Match' : 'Solo'}
             </p>
           </div>
         </div>

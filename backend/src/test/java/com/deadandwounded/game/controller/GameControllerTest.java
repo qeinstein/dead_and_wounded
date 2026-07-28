@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -42,8 +41,10 @@ class GameControllerTest {
     }
 
     @Test
-    void testCreateTwoPlayerGameWithCustomCode() throws Exception {
-        CreateGameRequest request = new CreateGameRequest(GameMode.TWO_PLAYER_SAME_DEVICE, "1234");
+    void testCreateTwoPlayerGameWithCustomCodes() throws Exception {
+        // Player 1 sets "1234" (to be guessed by P2)
+        // Player 2 sets "5678" (to be guessed by P1)
+        CreateGameRequest request = new CreateGameRequest(GameMode.TWO_PLAYER_SAME_DEVICE, "1234", "5678");
 
         MvcResult result = mockMvc.perform(post("/api/v1/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -56,28 +57,18 @@ class GameControllerTest {
         String json = result.getResponse().getContentAsString();
         String gameId = objectMapper.readTree(json).get("id").asText();
 
-        // Submit incorrect guess by Player 1
+        // Player 1's turn: Guesses Player 2's code ("5678"). Should get 4 Dead and win!
         GuessRequest guess1 = new GuessRequest("5678");
         mockMvc.perform(post("/api/v1/games/" + gameId + "/guess")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(guess1)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dead").value(0))
-                .andExpect(jsonPath("$.wounded").value(0))
-                .andExpect(jsonPath("$.gameOver").value(false))
-                .andExpect(jsonPath("$.nextTurn").value("PLAYER_2"));
-
-        // Submit winning guess by Player 2
-        GuessRequest guess2 = new GuessRequest("1234");
-        mockMvc.perform(post("/api/v1/games/" + gameId + "/guess")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(guess2)))
-                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.dead").value(4))
                 .andExpect(jsonPath("$.wounded").value(0))
                 .andExpect(jsonPath("$.gameOver").value(true))
-                .andExpect(jsonPath("$.winner").value("PLAYER_2"))
-                .andExpect(jsonPath("$.status").value("PLAYER2_WON"));
+                .andExpect(jsonPath("$.winner").value("PLAYER_1"))
+                .andExpect(jsonPath("$.status").value("PLAYER1_WON"))
+                .andExpect(jsonPath("$.player1History").isArray());
     }
 
     @Test

@@ -14,11 +14,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleStart = async (mode: GameMode, customSecretCode?: string) => {
+  const handleStart = async (mode: GameMode, p1Code?: string, p2Code?: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const g = await createGame({ mode, customSecretCode });
+      const g = await createGame({
+        mode,
+        player1SecretCode: p1Code,
+        player2SecretCode: p2Code,
+      });
       setGame(g);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to start game.');
@@ -33,7 +37,6 @@ export default function Home() {
     setError(null);
     try {
       const result = await submitGuess(game.id, guess);
-      // After guess, re-fetch full game state for accurate revealedSecretCode
       if (result.gameOver) {
         const fullGame = await getGame(game.id);
         setGame(fullGame);
@@ -45,6 +48,8 @@ export default function Home() {
             status: result.status,
             currentTurn: result.nextTurn || prev.currentTurn,
             history: result.history,
+            player1History: result.player1History || prev.player1History,
+            player2History: result.player2History || prev.player2History,
           };
         });
       }
@@ -68,7 +73,7 @@ export default function Home() {
     <div className="min-h-[100dvh] flex flex-col">
       <Navbar mode={game?.mode} onReset={handleReset} />
 
-      <main className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {error && (
           <div className="mb-4 px-4 py-2.5 rounded-xl bg-dead/10 border border-dead/20 text-xs text-dead text-center animate-fade-in">
             {error}
@@ -83,13 +88,19 @@ export default function Home() {
           <div className="space-y-6 animate-fade-in">
             <TurnIndicator mode={game.mode} currentTurn={game.currentTurn} />
 
-            {/* Responsive layout: stacked on mobile, side-by-side on desktop */}
+            {/* Layout: Keypad on top/left, Side-by-Side Dual History Tables on right/bottom */}
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
-              <div className="w-full lg:w-auto lg:flex-shrink-0">
+              <div className="w-full lg:w-[300px] lg:flex-shrink-0">
                 <KeypadInput onSubmit={handleGuess} isLoading={isLoading || isGameOver} />
               </div>
               <div className="w-full lg:flex-1 lg:min-w-0">
-                <GuessHistory history={game.history} mode={game.mode} />
+                <GuessHistory
+                  history={game.history}
+                  player1History={game.player1History}
+                  player2History={game.player2History}
+                  mode={game.mode}
+                  currentTurn={game.currentTurn}
+                />
               </div>
             </div>
           </div>

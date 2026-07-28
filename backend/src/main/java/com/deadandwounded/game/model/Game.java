@@ -12,25 +12,36 @@ public class Game {
     private GameMode mode;
     private GameStatus status;
     private Player currentTurn;
+    
     private List<GuessRecord> history;
+    private List<GuessRecord> player1History;
+    private List<GuessRecord> player2History;
     
     @JsonIgnore
-    private String secretCode;
+    private String player1SecretCode;
+    
+    @JsonIgnore
+    private String player2SecretCode;
     
     private Instant createdAt;
 
     public Game() {
         this.history = new ArrayList<>();
+        this.player1History = new ArrayList<>();
+        this.player2History = new ArrayList<>();
         this.createdAt = Instant.now();
     }
 
-    public Game(String id, GameMode mode, String secretCode) {
+    public Game(String id, GameMode mode, String player1SecretCode, String player2SecretCode) {
         this.id = id;
         this.mode = mode;
-        this.secretCode = secretCode;
+        this.player1SecretCode = player1SecretCode;
+        this.player2SecretCode = player2SecretCode;
         this.status = GameStatus.IN_PROGRESS;
         this.currentTurn = Player.PLAYER_1;
         this.history = new ArrayList<>();
+        this.player1History = new ArrayList<>();
+        this.player2History = new ArrayList<>();
         this.createdAt = Instant.now();
     }
 
@@ -74,19 +85,68 @@ public class Game {
         this.history = history;
     }
 
-    @JsonIgnore
-    public String getSecretCode() {
-        return secretCode;
+    public List<GuessRecord> getPlayer1History() {
+        return player1History;
     }
 
-    public void setSecretCode(String secretCode) {
-        this.secretCode = secretCode;
+    public void setPlayer1History(List<GuessRecord> player1History) {
+        this.player1History = player1History;
+    }
+
+    public List<GuessRecord> getPlayer2History() {
+        return player2History;
+    }
+
+    public void setPlayer2History(List<GuessRecord> player2History) {
+        this.player2History = player2History;
+    }
+
+    @JsonIgnore
+    public String getPlayer1SecretCode() {
+        return player1SecretCode;
+    }
+
+    public void setPlayer1SecretCode(String player1SecretCode) {
+        this.player1SecretCode = player1SecretCode;
+    }
+
+    @JsonIgnore
+    public String getPlayer2SecretCode() {
+        return player2SecretCode;
+    }
+
+    public void setPlayer2SecretCode(String player2SecretCode) {
+        this.player2SecretCode = player2SecretCode;
+    }
+
+    @JsonIgnore
+    public String getSecretCode() {
+        return player1SecretCode;
     }
 
     @JsonProperty("revealedSecretCode")
     public String getRevealedSecretCode() {
         if (status != GameStatus.IN_PROGRESS) {
-            return secretCode;
+            if (mode == GameMode.VS_COMPUTER) {
+                return player1SecretCode;
+            }
+            return player2SecretCode; // Code guessed by P1 or P2
+        }
+        return null;
+    }
+
+    @JsonProperty("revealedPlayer1SecretCode")
+    public String getRevealedPlayer1SecretCode() {
+        if (status != GameStatus.IN_PROGRESS) {
+            return player1SecretCode;
+        }
+        return null;
+    }
+
+    @JsonProperty("revealedPlayer2SecretCode")
+    public String getRevealedPlayer2SecretCode() {
+        if (status != GameStatus.IN_PROGRESS) {
+            return player2SecretCode;
         }
         return null;
     }
