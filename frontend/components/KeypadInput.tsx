@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { Delete } from 'lucide-react';
+import { CodeDisplay } from './CodeDisplay';
 
 interface KeypadInputProps {
   onSubmit: (guess: string) => void;
@@ -11,19 +13,22 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
   const [digits, setDigits] = useState<string[]>([]);
   const [error, setError] = useState('');
 
-  const addDigit = useCallback((d: string) => {
-    if (digits.length >= 4) return;
-    if (digits.includes(d)) {
-      setError(`'${d}' already used`);
-      return;
-    }
-    setError('');
-    setDigits(prev => [...prev, d]);
-  }, [digits]);
+  const addDigit = useCallback(
+    (d: string) => {
+      if (digits.length >= 4) return;
+      if (digits.includes(d)) {
+        setError(`${d} already used`);
+        return;
+      }
+      setError('');
+      setDigits((prev) => [...prev, d]);
+    },
+    [digits]
+  );
 
   const removeLast = useCallback(() => {
     setError('');
-    setDigits(prev => prev.slice(0, -1));
+    setDigits((prev) => prev.slice(0, -1));
   }, []);
 
   const clearAll = useCallback(() => {
@@ -33,7 +38,7 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
 
   const submit = useCallback(() => {
     if (digits.length !== 4) {
-      setError('Enter 4 digits');
+      setError('Enter all 4 digits');
       return;
     }
     onSubmit(digits.join(''));
@@ -53,93 +58,95 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
     return () => window.removeEventListener('keydown', onKey);
   }, [digits, isLoading, addDigit, removeLast, clearAll, submit]);
 
+  const ready = digits.length === 4;
+
   return (
-    <div className="w-full space-y-4">
-      {/* Digit Display */}
-      <div className="flex justify-center gap-2 sm:gap-3">
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className={`w-12 h-14 sm:w-14 sm:h-16 rounded-xl border-2 flex items-center justify-center font-mono text-xl sm:text-2xl font-bold transition-all ${
-              digits[i]
-                ? 'bg-surface-2 border-accent/40 text-white'
-                : 'bg-surface-1 border-surface-border text-neutral-700'
-            }`}
-          >
-            {digits[i] || '·'}
-          </div>
-        ))}
+    <div className="panel px-5 py-6 sm:px-7 sm:py-7">
+      {/* 3D readout */}
+      <CodeDisplay digits={digits} />
+
+      {/* status line */}
+      <div className="mt-1 mb-5 h-4 text-center">
+        {error ? (
+          <p className="text-[11px] font-medium text-dead animate-fade-in">{error}</p>
+        ) : (
+          <p className="eyebrow">
+            {ready ? 'Ready — submit your guess' : `${digits.length} / 4 digits`}
+          </p>
+        )}
       </div>
 
-      {error && (
-        <p className="text-[11px] text-dead text-center animate-fade-in">{error}</p>
-      )}
-
-      {/* Keypad */}
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-[240px] sm:max-w-[280px] mx-auto">
-        {['1','2','3','4','5','6','7','8','9'].map((n) => {
+      {/* keypad */}
+      <div className="mx-auto grid max-w-[300px] grid-cols-3 gap-2">
+        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((n) => {
           const used = digits.includes(n);
           return (
-            <button
-              key={n}
-              type="button"
-              disabled={isLoading || used}
-              onClick={() => addDigit(n)}
-              className={`h-11 sm:h-12 rounded-xl font-mono text-base font-semibold transition-all active:scale-95 ${
-                used
-                  ? 'bg-surface-1 text-neutral-700 cursor-not-allowed'
-                  : 'bg-surface-2 text-neutral-200 hover:bg-surface-3 border border-surface-border hover:border-neutral-600'
-              }`}
-            >
+            <KeyButton key={n} disabled={isLoading || used} used={used} onClick={() => addDigit(n)}>
               {n}
-            </button>
+            </KeyButton>
           );
         })}
 
-        {/* Bottom row */}
         <button
           type="button"
           disabled={isLoading || digits.length === 0}
           onClick={clearAll}
-          className="h-11 sm:h-12 rounded-xl text-xs font-medium text-neutral-500 hover:text-neutral-300 bg-surface-1 border border-surface-border transition-colors disabled:opacity-30 active:scale-95"
+          className="h-12 rounded-xl border border-surface-border bg-surface-1 text-[11px] font-semibold uppercase tracking-wider text-muted transition-all hover:text-neutral-200 disabled:opacity-30 active:scale-95"
         >
           Clear
         </button>
 
-        <button
-          type="button"
-          disabled={isLoading || digits.includes('0')}
-          onClick={() => addDigit('0')}
-          className={`h-11 sm:h-12 rounded-xl font-mono text-base font-semibold transition-all active:scale-95 ${
-            digits.includes('0')
-              ? 'bg-surface-1 text-neutral-700 cursor-not-allowed'
-              : 'bg-surface-2 text-neutral-200 hover:bg-surface-3 border border-surface-border hover:border-neutral-600'
-          }`}
-        >
+        <KeyButton disabled={isLoading || digits.includes('0')} used={digits.includes('0')} onClick={() => addDigit('0')}>
           0
-        </button>
+        </KeyButton>
 
         <button
           type="button"
           disabled={isLoading || digits.length === 0}
           onClick={removeLast}
-          className="h-11 sm:h-12 rounded-xl text-xs font-medium text-neutral-500 hover:text-neutral-300 bg-surface-1 border border-surface-border transition-colors disabled:opacity-30 active:scale-95"
+          aria-label="Delete last digit"
+          className="flex h-12 items-center justify-center rounded-xl border border-surface-border bg-surface-1 text-muted transition-all hover:text-neutral-200 disabled:opacity-30 active:scale-95"
         >
-          ←
+          <Delete className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Submit */}
-      <div className="max-w-[240px] sm:max-w-[280px] mx-auto">
-        <button
-          type="button"
-          disabled={isLoading || digits.length !== 4}
-          onClick={submit}
-          className="w-full py-3 rounded-xl font-semibold text-sm bg-accent hover:bg-accent-dim text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]"
-        >
-          {isLoading ? 'Checking...' : 'Submit'}
-        </button>
-      </div>
+      {/* submit */}
+      <button
+        type="button"
+        disabled={isLoading || !ready}
+        onClick={submit}
+        className="mx-auto mt-4 flex h-12 w-full max-w-[300px] items-center justify-center rounded-xl bg-accent text-sm font-semibold text-white shadow-glow transition-all hover:bg-accent-dim disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-neutral-600 disabled:shadow-none active:scale-[0.98]"
+      >
+        {isLoading ? 'Checking…' : 'Submit Guess'}
+      </button>
     </div>
   );
 };
+
+function KeyButton({
+  children,
+  used,
+  disabled,
+  onClick,
+}: {
+  children: React.ReactNode;
+  used: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`h-12 rounded-xl border font-mono text-lg font-semibold transition-all active:scale-95 ${
+        used
+          ? 'cursor-not-allowed border-surface-border bg-surface-1 text-neutral-700'
+          : 'border-surface-border bg-surface-2 text-neutral-100 hover:border-accent/40 hover:bg-surface-3'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}

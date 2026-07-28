@@ -2,30 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
-
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-surface text-neutral-200 font-sans antialiased;
+    @apply bg-surface text-neutral-300 font-sans antialiased;
     min-height: 100dvh;
+    background-image:
+      radial-gradient(60rem 60rem at 50% -20%, rgba(124, 108, 255, 0.06), transparent 60%),
+      radial-gradient(40rem 40rem at 100% 0%, rgba(78, 203, 138, 0.03), transparent 55%);
+    background-attachment: fixed;
   }
 
   ::selection {
     @apply bg-accent/30 text-white;
   }
 
-  /* Custom scrollbar */
+  /* Precision hairline scrollbar */
   ::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
     @apply bg-surface-border rounded-full;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #313644;
+  }
+}
+
+@layer components {
+  /* Frosted panel used across the app */
+  .panel {
+    @apply bg-surface-1/90 border border-surface-border rounded-2xl backdrop-blur-sm;
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
+      0 24px 48px -32px rgba(0, 0, 0, 0.85);
+  }
+
+  /* Small uppercase eyebrow label */
+  .eyebrow {
+    @apply text-[10px] font-semibold uppercase tracking-[0.2em] text-muted;
   }
 }

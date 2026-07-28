@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { BookOpen, RotateCcw } from 'lucide-react';
 import { GameMode } from '@/lib/api';
 import { InstructionsModal } from './InstructionsModal';
 
@@ -14,38 +16,42 @@ export const Navbar: React.FC<NavbarProps> = ({ mode, onReset }) => {
 
   return (
     <>
-      <header className="w-full border-b border-surface-border bg-surface-1/80 backdrop-blur-sm sticky top-0 z-30">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-              <span className="text-white text-xs font-bold">DW</span>
+      <header className="sticky top-0 z-30 w-full border-b border-surface-border bg-surface/70 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent shadow-glow">
+              <span className="font-mono text-[13px] font-bold text-white">DW</span>
             </div>
-            <div>
-              <h1 className="text-sm font-bold text-white leading-tight">Dead &amp; Wounded</h1>
-              {mode && (
-                <p className="text-[10px] text-neutral-500 font-medium">
-                  {mode === 'VS_COMPUTER' ? 'vs Computer' : 'Pass &amp; Play'}
-                </p>
-              )}
+            <div className="leading-tight">
+              <h1 className="text-sm font-semibold tracking-tight text-white">Dead &amp; Wounded</h1>
+              <p className="text-[10px] font-medium text-muted">
+                {mode ? (mode === 'VS_COMPUTER' ? 'Solo · vs Computer' : 'Pass &amp; Play') : 'Code Breaker'}
+              </p>
             </div>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-2">
+          <nav className="flex items-center gap-1.5">
             <button
               onClick={() => setShowRules(true)}
-              className="text-xs font-medium text-neutral-400 hover:text-white px-2.5 py-1.5 rounded-lg border border-surface-border hover:border-neutral-600 transition-colors flex items-center gap-1"
-              title="How to Play"
+              className="hidden items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-neutral-600 hover:text-white sm:flex"
             >
-              <span>Rules</span>
+              How to Play
             </button>
-
+            <Link
+              href="/about"
+              className="flex items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-neutral-600 hover:text-white"
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Engineering</span>
+            </Link>
             <button
               onClick={onReset}
-              className="text-xs font-medium text-neutral-400 hover:text-white px-3 py-1.5 rounded-lg border border-surface-border hover:border-neutral-600 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-neutral-300 transition-colors hover:border-neutral-600 hover:text-white"
             >
-              New Game
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">New Game</span>
             </button>
-          </div>
+          </nav>
         </div>
       </header>
 

@@ -11,35 +11,35 @@ interface TurnIndicatorProps {
 export const TurnIndicator: React.FC<TurnIndicatorProps> = ({ mode, currentTurn }) => {
   if (mode === 'VS_COMPUTER') {
     return (
-      <div className="text-center py-2">
-        <span className="text-xs text-neutral-500">Your turn — enter a 4-digit guess</span>
+      <div className="flex items-center justify-center gap-2 text-center">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+        </span>
+        <span className="text-xs text-muted">Your move — deduce the secret 4-digit code</span>
       </div>
     );
   }
 
   const isP1 = currentTurn === 'PLAYER_1';
+  const tone = isP1
+    ? 'border-accent/30 bg-accent/[0.06]'
+    : 'border-win/30 bg-win/[0.06]';
+  const text = isP1 ? 'text-accent' : 'text-win';
+  const dot = isP1 ? 'bg-accent' : 'bg-win';
 
   return (
-    <div className={`text-center py-3 px-4 rounded-xl border transition-all animate-fade-in ${
-      isP1
-        ? 'bg-accent/5 border-accent/30 text-accent'
-        : 'bg-purple-500/5 border-purple-500/30 text-purple-400'
-    }`}>
-      <div className="flex items-center justify-between">
-        <div className="text-left">
-          <p className="text-[10px] text-neutral-500 uppercase tracking-wider">Current Turn</p>
-          <p className="text-sm font-bold">
-            {isP1 ? 'Player 1' : 'Player 2'}
-          </p>
-        </div>
-
-        <div className="text-right">
-          <p className="text-[10px] text-neutral-500 uppercase tracking-wider">Target Objective</p>
-          <p className="text-xs font-semibold text-neutral-300">
-            {isP1 ? "Guessing Player 2's Code" : "Guessing Player 1's Code"}
-          </p>
+    <div className={`mx-auto flex max-w-md items-center justify-between rounded-xl border px-4 py-3 transition-all animate-fade-in ${tone}`}>
+      <div className="flex items-center gap-2.5">
+        <span className={`h-2 w-2 rounded-full ${dot}`} />
+        <div>
+          <p className="eyebrow">Current turn</p>
+          <p className={`text-sm font-semibold ${text}`}>{isP1 ? 'Player 1' : 'Player 2'}</p>
         </div>
       </div>
+      <p className="text-right text-[11px] font-medium text-muted">
+        Cracking {isP1 ? "Player 2's" : "Player 1's"} code
+      </p>
     </div>
   );
 };
