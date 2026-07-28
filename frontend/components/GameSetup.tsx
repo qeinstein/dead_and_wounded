@@ -52,7 +52,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, isLoading }) 
     <div className="w-full max-w-md space-y-6 animate-fade-in">
       <div className="space-y-2 text-center">
         <span className="eyebrow">New game</span>
-        <h2 className="text-2xl font-semibold tracking-tight text-white">Crack the code</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Crack the code</h2>
         <p className="mx-auto max-w-xs text-sm text-muted">
           Deduce a secret sequence of four unique digits from Dead &amp; Wounded feedback.
         </p>
@@ -80,7 +80,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, isLoading }) 
       <div className="panel space-y-4 p-4">
         {!is2P ? (
           <p className="text-center text-sm text-muted">
-            The computer picks a secret code with <span className="text-neutral-200">Fisher–Yates</span> shuffling.
+            The computer picks a secret code with <span className="text-slate-800">Fisher–Yates</span> shuffling.
             Guess it in as few rounds as possible.
           </p>
         ) : (
@@ -135,14 +135,14 @@ function ModeCard({
       className={`flex flex-col items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
         active
           ? 'border-accent/50 bg-accent/[0.07] shadow-glow'
-          : 'border-surface-border bg-surface-1 hover:border-neutral-600'
+          : 'border-surface-border bg-surface-1 hover:border-slate-300'
       }`}
     >
       <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${active ? 'bg-accent text-white' : 'bg-surface-3 text-muted'}`}>
         {icon}
       </span>
       <span>
-        <span className={`block text-sm font-semibold ${active ? 'text-white' : 'text-neutral-300'}`}>{title}</span>
+        <span className={`block text-sm font-semibold ${active ? 'text-slate-900' : 'text-slate-600'}`}>{title}</span>
         <span className="block text-[11px] text-muted">{subtitle}</span>
       </span>
     </button>
@@ -180,7 +180,7 @@ function CodeSetup({
                 ? accent === 'accent'
                   ? 'border-accent/50 bg-accent/10 text-accent'
                   : 'border-win/50 bg-win/10 text-win'
-                : 'border-surface-border text-muted hover:text-neutral-200'
+                : 'border-surface-border text-muted hover:text-slate-800'
             }`}
           >
             {t === 'random' ? <Shuffle className="h-3 w-3" /> : <PenLine className="h-3 w-3" />}
@@ -197,13 +197,13 @@ function CodeSetup({
             value={value}
             onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 4))}
             placeholder="e.g. 1234"
-            className={`w-full rounded-xl border border-surface-border bg-surface-2 px-3 py-2.5 text-center font-mono text-sm tracking-[0.4em] text-white placeholder:tracking-normal placeholder:text-neutral-600 focus:outline-none ${focusRing}`}
+            className={`w-full rounded-xl border border-surface-border bg-surface-2 px-3 py-2.5 text-center font-mono text-sm tracking-[0.4em] text-slate-900 placeholder:tracking-normal placeholder:text-slate-400 focus:outline-none ${focusRing}`}
           />
           <button
             type="button"
             onClick={toggleShow}
             aria-label={show ? 'Hide code' : 'Show code'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-neutral-200"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-slate-800"
           >
             {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>

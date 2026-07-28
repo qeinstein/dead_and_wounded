@@ -38,16 +38,16 @@ function FeedbackPegs({ dead, wounded }: { dead: number; wounded: number }) {
 
 function GuessRow({ item, round }: { item: GuessRecord; round: number }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-surface-border bg-surface-2/60 px-3.5 py-3 transition-colors hover:border-neutral-700 animate-slide-up">
+    <div className="flex items-center justify-between rounded-xl border border-surface-border bg-surface-2/60 px-3.5 py-3 transition-colors hover:border-slate-200 animate-slide-up">
       <div className="flex items-center gap-3.5">
-        <span className="w-6 font-mono text-[11px] text-neutral-600">{round.toString().padStart(2, '0')}</span>
-        <span className="font-mono text-lg font-semibold tracking-[0.35em] text-white">{item.guess}</span>
+        <span className="w-6 font-mono text-[11px] text-slate-400">{round.toString().padStart(2, '0')}</span>
+        <span className="font-mono text-lg font-semibold tracking-[0.35em] text-slate-900">{item.guess}</span>
       </div>
       <div className="flex items-center gap-4">
         <FeedbackPegs dead={item.dead} wounded={item.wounded} />
         <div className="flex items-center gap-3 font-mono text-xs tabular-nums">
-          <span className={item.dead > 0 ? 'text-dead' : 'text-neutral-600'}>{item.dead}<span className="text-neutral-600">D</span></span>
-          <span className={item.wounded > 0 ? 'text-wounded' : 'text-neutral-600'}>{item.wounded}<span className="text-neutral-600">W</span></span>
+          <span className={item.dead > 0 ? 'text-dead' : 'text-slate-400'}>{item.dead}<span className="text-slate-400">D</span></span>
+          <span className={item.wounded > 0 ? 'text-wounded' : 'text-slate-400'}>{item.wounded}<span className="text-slate-400">W</span></span>
         </div>
       </div>
     </div>
@@ -85,7 +85,7 @@ function Column({
       <div className="flex items-center justify-between border-b border-surface-border pb-2.5">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${dot}`} />
-          <span className="text-xs font-semibold text-neutral-200">{title}</span>
+          <span className="text-xs font-semibold text-slate-800">{title}</span>
         </div>
         <span className="text-[10px] text-muted">{list.length} {list.length === 1 ? 'guess' : 'guesses'}</span>
       </div>
@@ -119,7 +119,7 @@ export const GuessHistory: React.FC<GuessHistoryProps> = ({
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-semibold text-neutral-300">Deduction log</h2>
+          <h2 className="text-xs font-semibold text-slate-600">Deduction log</h2>
           <span className="eyebrow">side&nbsp;by&nbsp;side</span>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -135,7 +135,7 @@ export const GuessHistory: React.FC<GuessHistoryProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-xs font-semibold text-neutral-300">Deduction log</h2>
+        <h2 className="text-xs font-semibold text-slate-600">Deduction log</h2>
         <span className="eyebrow">{history.length} {history.length === 1 ? 'guess' : 'guesses'}</span>
       </div>
       {history.length === 0 ? (

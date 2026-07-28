@@ -25,7 +25,7 @@ export default function AboutPage() {
       {/* header */}
       <header className="sticky top-0 z-30 border-b border-surface-border bg-surface/70 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2 text-xs font-medium text-muted transition-colors hover:text-white">
+          <Link href="/" className="flex items-center gap-2 text-xs font-medium text-muted transition-colors hover:text-slate-900">
             <ArrowLeft className="h-4 w-4" />
             Back to game
           </Link>
@@ -37,19 +37,19 @@ export default function AboutPage() {
         {/* hero */}
         <section className="space-y-4">
           <span className="eyebrow text-accent">Dead &amp; Wounded</span>
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
             A code-breaking game built on real Java concurrency
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
             Dead &amp; Wounded is a full-stack take on the classic Bulls &amp; Cows deduction game. Its purpose
             is as much engineering as play: a stateful, multi-session web service that stays correct under
-            concurrent load using core Java concurrency primitives — <span className="text-neutral-200">ConcurrentHashMap</span> for
-            lock-free session storage and <span className="text-neutral-200">method-level synchronization</span> for
+            concurrent load using core Java concurrency primitives — <span className="text-slate-800">ConcurrentHashMap</span> for
+            lock-free session storage and <span className="text-slate-800">method-level synchronization</span> for
             atomic state transitions.
           </p>
           <div className="flex flex-wrap gap-2 pt-1">
             {['Java 17', 'Spring Boot 3.3', 'Next.js 14', 'TypeScript', 'Tailwind', 'three.js'].map((t) => (
-              <span key={t} className="rounded-full border border-surface-border bg-surface-1 px-3 py-1 text-[11px] font-medium text-neutral-300">
+              <span key={t} className="rounded-full border border-surface-border bg-surface-1 px-3 py-1 text-[11px] font-medium text-slate-600">
                 {t}
               </span>
             ))}
@@ -60,12 +60,12 @@ export default function AboutPage() {
         <Section title="What was built" eyebrow="Overview">
           <div className="grid gap-4 sm:grid-cols-2">
             <Card icon={<Server className="h-4 w-4" />} title="Concurrent backend">
-              A <b className="text-neutral-200">Spring Boot 3 / Java 17</b> REST API that creates game sessions,
+              A <b className="text-slate-800">Spring Boot 3 / Java 17</b> REST API that creates game sessions,
               evaluates guesses, and manages turns. Secret codes are generated with a Fisher–Yates shuffle
               (<code className="text-accent">Collections.shuffle</code>, backed by <code className="text-accent">ThreadLocalRandom</code>).
             </Card>
             <Card icon={<MonitorSmartphone className="h-4 w-4" />} title="Reactive client">
-              A <b className="text-neutral-200">Next.js 14</b> App-Router client with a 3D machined readout, a tactile
+              A <b className="text-slate-800">Next.js 14</b> App-Router client with a 3D machined readout, a tactile
               keypad, and a Mastermind-style deduction log — with defense-in-depth validation before anything hits the network.
             </Card>
           </div>
@@ -86,18 +86,18 @@ export default function AboutPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card icon={<Database className="h-4 w-4" />} title="ConcurrentHashMap for sessions">
               All active games live in a <code className="text-accent">ConcurrentHashMap&lt;String, Game&gt;</code>.
-              Reads (<code className="text-accent">get</code>) take <b className="text-neutral-200">no lock</b> — O(1)
+              Reads (<code className="text-accent">get</code>) take <b className="text-slate-800">no lock</b> — O(1)
               retrieval — and writes use bucket-level compare-and-swap, so creating one game never blocks reading another.
               <p className="mt-3 rounded-lg border border-surface-border bg-surface-2 p-3 text-xs text-muted">
-                <b className="text-neutral-300">Why not <code>Collections.synchronizedMap</code>?</b> A single monitor
+                <b className="text-slate-600">Why not <code>Collections.synchronizedMap</code>?</b> A single monitor
                 would serialize <i>every</i> read and write — a <code>GET</code> for game&nbsp;A would block behind a
                 <code>guess</code> for unrelated game&nbsp;B. ConcurrentHashMap removes that cross-session contention entirely.
               </p>
             </Card>
             <Card icon={<Lock className="h-4 w-4" />} title="synchronized submitGuess()">
-              A guess is a <b className="text-neutral-200">compound operation</b>, made atomic by synchronizing on the
+              A guess is a <b className="text-slate-800">compound operation</b>, made atomic by synchronizing on the
               service instance:
-              <pre className="mt-3 overflow-x-auto rounded-lg border border-surface-border bg-surface-2 p-3 font-mono text-[11px] leading-relaxed text-neutral-300">
+              <pre className="mt-3 overflow-x-auto rounded-lg border border-surface-border bg-surface-2 p-3 font-mono text-[11px] leading-relaxed text-slate-600">
 {`public synchronized GuessResult
   submitGuess(String id, String guess) {
     // evaluate → append history →
@@ -116,7 +116,7 @@ export default function AboutPage() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Card icon={<Cpu className="h-4 w-4" />} title="Thread model">
               Requests run on Tomcat&apos;s worker pool (~200 threads). A separate <code className="text-accent">@Scheduled</code>{' '}
-              <b className="text-neutral-200">PingScheduler</b> runs on its own single-threaded executor, self-pinging every
+              <b className="text-slate-800">PingScheduler</b> runs on its own single-threaded executor, self-pinging every
               30s to keep the free-tier container warm — fully independent of request handling.
             </Card>
             <Card icon={<ShieldCheck className="h-4 w-4" />} title="Anti-cheat by design">
@@ -134,12 +134,12 @@ export default function AboutPage() {
               <code className="text-accent">submitGuess</code> is a coarse lock on the single <code className="text-accent">GameService</code>{' '}
               bean, so it serializes guesses across <i>all</i> games. That is ideal for the real load profile
               (single-device pass &amp; play) — but for high concurrency the next step is a{' '}
-              <b className="text-neutral-200">per-game <code>ReentrantLock</code></b> stored beside each game, so only
+              <b className="text-slate-800">per-game <code>ReentrantLock</code></b> stored beside each game, so only
               guesses within the same session contend.
             </Card>
             <Card icon={<GitBranch className="h-4 w-4" />} title="From single JVM to a cluster">
               Sessions are held in-memory per JVM. To scale horizontally, that map moves to a{' '}
-              <b className="text-neutral-200">shared store</b> (Redis / a distributed cache) with sticky sessions or
+              <b className="text-slate-800">shared store</b> (Redis / a distributed cache) with sticky sessions or
               optimistic versioning — keeping the same atomic-transition guarantees across nodes.
             </Card>
           </div>
@@ -170,7 +170,7 @@ export default function AboutPage() {
         </Section>
 
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-surface-border bg-surface-1 p-8 text-center">
-          <h3 className="text-lg font-semibold text-white">Try to crack a code</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Try to crack a code</h3>
           <p className="max-w-md text-sm text-muted">The engineering only matters if the game holds up. See how few rounds you need.</p>
           <Link
             href="/"
@@ -182,7 +182,7 @@ export default function AboutPage() {
       </main>
 
       <footer className="border-t border-surface-border py-6 text-center">
-        <p className="text-[11px] text-neutral-600">Dead &amp; Wounded — engineering notes</p>
+        <p className="text-[11px] text-slate-400">Dead &amp; Wounded — engineering notes</p>
       </footer>
     </div>
   );
@@ -195,7 +195,7 @@ function Section({ title, eyebrow, children }: { title: string; eyebrow: string;
     <section className="space-y-5">
       <div className="space-y-1.5">
         <span className="eyebrow text-accent">{eyebrow}</span>
-        <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{title}</h2>
+        <h2 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">{title}</h2>
       </div>
       {children}
     </section>
@@ -209,7 +209,7 @@ function Card({ icon, title, children }: { icon: React.ReactNode; title: string;
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-accent/20">
           {icon}
         </span>
-        <h3 className="text-sm font-semibold text-white">{title}</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
       </div>
       <div className="text-sm leading-relaxed text-muted">{children}</div>
     </div>
@@ -242,7 +242,7 @@ function Problem({ title, children }: { title: string; children: React.ReactNode
     <div className="flex gap-3 rounded-xl border border-surface-border bg-surface-1 p-4">
       <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-wounded" />
       <div>
-        <p className="text-sm font-semibold text-white">{title}</p>
+        <p className="text-sm font-semibold text-slate-900">{title}</p>
         <p className="mt-1 text-xs leading-relaxed text-muted">{children}</p>
       </div>
     </div>
@@ -290,13 +290,13 @@ function Tier({
   const ring =
     tone === 'accent' ? 'border-accent/30' : tone === 'win' ? 'border-win/30' : 'border-surface-border';
   const iconTone =
-    tone === 'accent' ? 'bg-accent/10 text-accent' : tone === 'win' ? 'bg-win/10 text-win' : 'bg-surface-3 text-neutral-300';
+    tone === 'accent' ? 'bg-accent/10 text-accent' : tone === 'win' ? 'bg-win/10 text-win' : 'bg-surface-3 text-slate-600';
   return (
     <div className={`rounded-xl border bg-surface-2/50 p-4 ${ring}`}>
       <div className="flex items-center gap-3">
         <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconTone}`}>{icon}</span>
         <div>
-          <p className="text-sm font-semibold text-white">{label}</p>
+          <p className="text-sm font-semibold text-slate-900">{label}</p>
           {detail && <p className="font-mono text-[11px] text-muted">{detail}</p>}
         </div>
       </div>
@@ -308,7 +308,7 @@ function Tier({
 function SubBox({ title, body, highlight }: { title: string; body: string; highlight?: boolean }) {
   return (
     <div className={`rounded-lg border p-3 ${highlight ? 'border-accent/40 bg-accent/[0.06]' : 'border-surface-border bg-surface-1'}`}>
-      <p className={`font-mono text-xs font-semibold ${highlight ? 'text-accent' : 'text-neutral-200'}`}>{title}</p>
+      <p className={`font-mono text-xs font-semibold ${highlight ? 'text-accent' : 'text-slate-800'}`}>{title}</p>
       <p className="mt-0.5 text-[10px] text-muted">{body}</p>
     </div>
   );
@@ -318,7 +318,7 @@ function Connector({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3 pl-4">
       <div className="h-6 w-px bg-surface-border" />
-      <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-600">{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-wider text-slate-400">{label}</span>
     </div>
   );
 }

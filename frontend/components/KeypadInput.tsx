@@ -91,7 +91,7 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
           type="button"
           disabled={isLoading || digits.length === 0}
           onClick={clearAll}
-          className="h-12 rounded-xl border border-surface-border bg-surface-1 text-[11px] font-semibold uppercase tracking-wider text-muted transition-all hover:text-neutral-200 disabled:opacity-30 active:scale-95"
+          className="h-12 rounded-xl border border-surface-border bg-surface-1 text-[11px] font-semibold uppercase tracking-wider text-muted transition-all hover:text-slate-800 disabled:opacity-30 active:scale-95"
         >
           Clear
         </button>
@@ -105,7 +105,7 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
           disabled={isLoading || digits.length === 0}
           onClick={removeLast}
           aria-label="Delete last digit"
-          className="flex h-12 items-center justify-center rounded-xl border border-surface-border bg-surface-1 text-muted transition-all hover:text-neutral-200 disabled:opacity-30 active:scale-95"
+          className="flex h-12 items-center justify-center rounded-xl border border-surface-border bg-surface-1 text-muted transition-all hover:text-slate-800 disabled:opacity-30 active:scale-95"
         >
           <Delete className="h-4 w-4" />
         </button>
@@ -116,7 +116,7 @@ export const KeypadInput: React.FC<KeypadInputProps> = ({ onSubmit, isLoading })
         type="button"
         disabled={isLoading || !ready}
         onClick={submit}
-        className="mx-auto mt-4 flex h-12 w-full max-w-[300px] items-center justify-center rounded-xl bg-accent text-sm font-semibold text-white shadow-glow transition-all hover:bg-accent-dim disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-neutral-600 disabled:shadow-none active:scale-[0.98]"
+        className="mx-auto mt-4 flex h-12 w-full max-w-[300px] items-center justify-center rounded-xl bg-accent text-sm font-semibold text-white shadow-glow transition-all hover:bg-accent-dim disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98]"
       >
         {isLoading ? 'Checking…' : 'Submit Guess'}
       </button>
@@ -142,8 +142,8 @@ function KeyButton({
       onClick={onClick}
       className={`h-12 rounded-xl border font-mono text-lg font-semibold transition-all active:scale-95 ${
         used
-          ? 'cursor-not-allowed border-surface-border bg-surface-1 text-neutral-700'
-          : 'border-surface-border bg-surface-2 text-neutral-100 hover:border-accent/40 hover:bg-surface-3'
+          ? 'cursor-not-allowed border-surface-border bg-surface-1 text-slate-300'
+          : 'border-surface-border bg-surface-2 text-slate-900 hover:border-accent/40 hover:bg-surface-3'
       }`}
     >
       {children}

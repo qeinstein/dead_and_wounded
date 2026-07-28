@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ mode, onReset }) => {
               <span className="font-mono text-[13px] font-bold text-white">DW</span>
             </div>
             <div className="leading-tight">
-              <h1 className="text-sm font-semibold tracking-tight text-white">Dead &amp; Wounded</h1>
+              <h1 className="text-sm font-semibold tracking-tight text-slate-900">Dead &amp; Wounded</h1>
               <p className="text-[10px] font-medium text-muted">
                 {mode ? (mode === 'VS_COMPUTER' ? 'Solo · vs Computer' : 'Pass &amp; Play') : 'Code Breaker'}
               </p>
@@ -33,20 +33,20 @@ export const Navbar: React.FC<NavbarProps> = ({ mode, onReset }) => {
           <nav className="flex items-center gap-1.5">
             <button
               onClick={() => setShowRules(true)}
-              className="hidden items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-neutral-600 hover:text-white sm:flex"
+              className="hidden items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-slate-300 hover:text-slate-900 sm:flex"
             >
               How to Play
             </button>
             <Link
               href="/about"
-              className="flex items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-neutral-600 hover:text-white"
+              className="flex items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-slate-300 hover:text-slate-900"
             >
               <BookOpen className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Engineering</span>
             </Link>
             <button
               onClick={onReset}
-              className="flex items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-neutral-300 transition-colors hover:border-neutral-600 hover:text-white"
+              className="flex items-center gap-1.5 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">New Game</span>

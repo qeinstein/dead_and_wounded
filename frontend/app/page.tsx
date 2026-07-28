@@ -105,7 +105,7 @@ export default function Home() {
       {game && isGameOver ? <WinModal game={game} onPlayAgain={handleReset} /> : null}
 
       <footer className="border-t border-surface-border py-4 text-center">
-        <p className="text-[11px] text-neutral-600">
+        <p className="text-[11px] text-slate-400">
           Dead &amp; Wounded · concurrent Java service &amp; Next.js client · &copy; {new Date().getFullYear()}
         </p>
       </footer>

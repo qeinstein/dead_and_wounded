@@ -13,7 +13,7 @@ interface WinModalProps {
 export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
   useEffect(() => {
     const end = Date.now() + 2000;
-    const colors = ['#7c6cff', '#4ecb8a', '#f4b13d', '#ffffff'];
+    const colors = ['#4f46e5', '#059669', '#d97706', '#e11d48'];
     const frame = () => {
       confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors });
       confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors });
@@ -32,7 +32,7 @@ export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
   const p2Code = game.revealedPlayer2SecretCode || game.revealedSecretCode || '????';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-md animate-fade-in">
       <div className="panel w-full max-w-sm space-y-6 p-7 text-center animate-scale-in">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 ring-1 ring-accent/30">
           <Trophy className="h-6 w-6 text-accent" />
@@ -40,7 +40,7 @@ export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
 
         <div className="space-y-1.5">
           <span className="eyebrow text-win">Match complete</span>
-          <h2 className="text-2xl font-semibold tracking-tight text-white">{winner}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900">{winner}</h2>
         </div>
 
         {is2P ? (
@@ -65,12 +65,12 @@ export const WinModal: React.FC<WinModalProps> = ({ game, onPlayAgain }) => {
 
         <div className="flex items-center justify-center gap-8 border-t border-surface-border pt-5">
           <div>
-            <p className="text-2xl font-semibold text-white">{total}</p>
+            <p className="text-2xl font-semibold text-slate-900">{total}</p>
             <p className="eyebrow mt-0.5">Rounds</p>
           </div>
           <div className="h-8 w-px bg-surface-border" />
           <div>
-            <p className="text-sm font-semibold text-neutral-200">{is2P ? '2-Player' : 'Solo'}</p>
+            <p className="text-sm font-semibold text-slate-800">{is2P ? '2-Player' : 'Solo'}</p>
             <p className="eyebrow mt-0.5">Mode</p>
           </div>
         </div>

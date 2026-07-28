@@ -15,7 +15,7 @@ function Fallback() {
       {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
-          className="flex h-16 w-12 items-center justify-center rounded-xl border border-surface-border bg-surface-2 font-mono text-2xl text-neutral-700"
+          className="flex h-16 w-12 items-center justify-center rounded-xl border border-surface-border bg-surface-2 font-mono text-2xl text-slate-300"
         >
           ·
         </div>
